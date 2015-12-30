@@ -15,8 +15,8 @@ static void bg_create_proc(Layer *layer, GContext *ctx) {
 	GPoint center = grect_center_point(&bounds);
 
 	graphics_context_set_stroke_width(ctx, 1);
-	graphics_context_set_stroke_color(ctx, GColorDukeBlue);
-	graphics_context_set_text_color(ctx, GColorDukeBlue);
+	graphics_context_set_stroke_color(ctx, GColorBlue);
+	graphics_context_set_text_color(ctx, GColorBlue);
 
 	graphics_draw_circle(ctx, center, 64); // outer circle
 	graphics_draw_circle(ctx, center, 33); // inner circle
@@ -79,6 +79,10 @@ static void hands_update_proc(Layer *layer, GContext *ctx) {
 
 }
 
+static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+	layer_mark_dirty(hands_layer);
+}
+
 static void main_window_load() {
 	bg_layer = layer_create(GRect(0, 0, 144, 168));
 	layer_set_update_proc(bg_layer, bg_create_proc);
@@ -98,6 +102,8 @@ static void init() {
 	window = window_create();
 	
 	window_set_background_color(window, GColorBlack);
+	
+	tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
 
 	window_set_window_handlers(window, (WindowHandlers) {
 		.load = main_window_load,
@@ -106,10 +112,10 @@ static void init() {
 
 	window_stack_push(window, true);
 
-	hour_target = gpath_create(&HOUR_TARGET_POINTS);
+	hour_target = gpath_create(&MINUTE_TARGET_POINTS);
 	gpath_move_to(hour_target, GPoint(72, 84));
 
-	minute_target = gpath_create(&MINUTE_TARGET_POINTS);
+	minute_target = gpath_create(&HOUR_TARGET_POINTS);
 	gpath_move_to(minute_target, GPoint(72, 84));
 /*
 	hour_target = gpath_create(&HOUR_TARGET_POINTS);
